@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <bpmn:process id="BPMNParserProcess" name="BPMN Parser Process" isExecutable="true" camunda:historyTimeToLive="60">
+    <bpmn:documentation>This is the process that needs to be parsed for documentation purposes.</bpmn:documentation>
+    <bpmn:startEvent id="StartStartEvent" name="Start" camunda:asyncBefore="true">
+      <bpmn:documentation>This is where the process starts...Duh.</bpmn:documentation>
+      <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="StartStartEvent" targetRef="SayHelloToAdminTask" />
+    <bpmn:endEvent id="EndEndEvent" name="End">
+      <bpmn:documentation>Let's end this thing.</bpmn:documentation>
+      <bpmn:incoming>Flow_0n2ug4s</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="SayHelloToAdminTask" targetRef="ServiceTask1Task" />
+    <bpmn:userTask id="SayHelloToAdminTask" name="Say hello to&#10;admin" camunda:assignee="Coolio" camunda:candidateUsers="admin">
+      <bpmn:documentation>This is where the user needs to say "hello" to the admin.</bpmn:documentation>
+      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0sdxau7" sourceRef="ServiceTask1Task" targetRef="ServiceTask2Task" />
+    <bpmn:serviceTask id="ServiceTask1Task" name="External Task" camunda:asyncBefore="true" camunda:type="external" camunda:topic="serviceTask1Worker">
+      <bpmn:documentation>Service Task to do something to another thing with some great code.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">print("I gotta do some scripting");</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sdxau7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ServiceTask2Task" name="Delegate Task" camunda:asyncBefore="true" camunda:delegateExpression="${serviceTaskOneDelegate}">
+      <bpmn:documentation>Service Task to do something else to yet another thing with some great code.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">print("I gotta do some scripting...again");</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0sdxau7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gd2c9j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1gd2c9j" sourceRef="ServiceTask2Task" targetRef="Activity_13omnql" />
+    <bpmn:sequenceFlow id="Flow_0qlijcg" sourceRef="Activity_13omnql" targetRef="Activity_045kder" />
+    <bpmn:serviceTask id="Activity_13omnql" name="Java Task" camunda:class="com.my.service.Task">
+      <bpmn:incoming>Flow_1gd2c9j</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qlijcg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0chordw" sourceRef="Activity_045kder" targetRef="Activity_1uombid" />
+    <bpmn:serviceTask id="Activity_045kder" name="Expression Task" camunda:expression="myExpression">
+      <bpmn:incoming>Flow_0qlijcg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0chordw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0n2ug4s" sourceRef="Activity_1uombid" targetRef="EndEndEvent" />
+    <bpmn:serviceTask id="Activity_1uombid" name="Connector Task">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>myConnector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0chordw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0n2ug4s</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BPMNParserProcess">
+      <bpmndi:BPMNEdge id="SequenceFlow_16gzt2m_di" bpmnElement="SequenceFlow_16gzt2m">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="420" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sdxau7_di" bpmnElement="Flow_0sdxau7">
+        <di:waypoint x="520" y="117" />
+        <di:waypoint x="570" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gd2c9j_di" bpmnElement="Flow_1gd2c9j">
+        <di:waypoint x="670" y="117" />
+        <di:waypoint x="720" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qlijcg_di" bpmnElement="Flow_0qlijcg">
+        <di:waypoint x="820" y="117" />
+        <di:waypoint x="870" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0chordw_di" bpmnElement="Flow_0chordw">
+        <di:waypoint x="970" y="117" />
+        <di:waypoint x="1010" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n2ug4s_di" bpmnElement="Flow_0n2ug4s">
+        <di:waypoint x="1110" y="117" />
+        <di:waypoint x="1142" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartStartEvent">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="142" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_08mft2c_di" bpmnElement="SayHelloToAdminTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1f2249u_di" bpmnElement="ServiceTask1Task">
+        <dc:Bounds x="420" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1t4ff3t_di" bpmnElement="ServiceTask2Task">
+        <dc:Bounds x="570" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEndEvent">
+        <dc:Bounds x="1142" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1150" y="142" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vx414j_di" bpmnElement="Activity_13omnql">
+        <dc:Bounds x="720" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i76jal_di" bpmnElement="Activity_045kder">
+        <dc:Bounds x="870" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1eqgien_di" bpmnElement="Activity_1uombid">
+        <dc:Bounds x="1010" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
