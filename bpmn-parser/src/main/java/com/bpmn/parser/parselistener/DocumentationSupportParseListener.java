@@ -126,11 +126,10 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         if (markdownDoc.getUserTasks().size() > 0) {
             stringBuilder.append(new Heading("User Tasks", 3)).append("\n");
             tableBuilder = new Table.Builder()
-                    .withRowLimit(7)
-                    .addRow("Key", "Assignee", "Candidate Users", "Candidate Groups", "Form Key");
+                    .addRow("Key", "Assignee", "Candidate Users", "Candidate Groups", "Form Key", "Documentation");
 
             for (Task task : markdownDoc.getUserTasks()) {
-                tableBuilder.addRow(task.getKey(), task.getAssignee(), task.getCadidateUsers(), task.getCadidateGroups(), task.getFormKey());
+                tableBuilder.addRow(task.getKey(), task.getAssignee(), task.getCadidateUsers(), task.getCadidateGroups(), task.getFormKey(), task.getDocumentation());
             }
             stringBuilder.append(tableBuilder.build()).append("\n").append("\n");
         }
@@ -159,8 +158,8 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
             stringBuilder.append("\n");
         }
 
-        // TODO Element Documentation
-        stringBuilder.append(new Heading("Element Documentation", 2)).append("\n");
+        // TODO Element Documentation - Added to the columns - Implemented in User Tasks only
+//        stringBuilder.append(new Heading("Element Documentation", 2)).append("\n");
 
         // Write File
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -237,7 +236,7 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
             else {
                 try {
                     String connector = element.elements("extensionElements").get(0).elements("connector").get(0).elements().get(0).getText();
-                    task.setBehavior("Connector: " + connector);
+                    task.setBehavior("Connector: Consider Using a Different Implementation");
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -271,6 +270,9 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
                 forms.add(taskDefinition.getFormKey().getExpressionText());
                 task.setFormKey(taskDefinition.getFormKey().getExpressionText());
             }
+            if (taskDefinition.getDescriptionExpression() != null) {
+                task.setDocumentation(taskDefinition.getDescriptionExpression().getExpressionText());
+            }
             tasks.add(task);
         }
 
@@ -283,11 +285,12 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         List<Element> startEvents = processElement.elements("startEvent");
         String startEventsCSV = "";
         for (Element element: startEvents) {
+            String name = element.attribute("name").replace("\n", "");
             if (startEventsCSV.equals("")) {
-                startEventsCSV = element.attribute("name");
+                startEventsCSV = name;
             }
             else {
-                startEventsCSV = startEventsCSV + ", " + element.attribute("name");
+                startEventsCSV = startEventsCSV + ", " + name;
             }
         }
         return startEventsCSV;
@@ -297,11 +300,12 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         List<Element> endEvents = processElement.elements("endEvent");
         String endEventsCSV = "";
         for (Element element: endEvents) {
+            String name = element.attribute("name").replace("\n", "");
             if (endEventsCSV .equals("")) {
-                endEventsCSV  = element.attribute("name");
+                endEventsCSV  = name;
             }
             else {
-                endEventsCSV  = endEventsCSV  + ", " + element.attribute("name");
+                endEventsCSV  = endEventsCSV  + ", " + name;
             }
         }
         return endEventsCSV;
@@ -336,7 +340,7 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
             else{
                 task.setMapDecisionResult("resultList");
             }
-            businessRuleTaskNames.add(element.attribute("name"));
+            businessRuleTaskNames.add(element.attribute("name") + " - " + element.attribute("http://camunda.org/schema/1.0/bpmn:decisionRef"));
             businessRuleTasks.add(task);
         }
         markdownDoc.setDmns(businessRuleTaskNames);
