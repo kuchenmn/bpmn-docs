@@ -65,7 +65,6 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
                 .withRowLimit(7)
                 .addRow("Category", "Values");
 
-
         // Summary
         Map<String, String> summary = new LinkedHashMap<>();
 
@@ -73,8 +72,8 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         StringBuilder participants = new StringBuilder();
 
         // Add Participants based on Lanes
-        participants.append(getParticipantsByLanes(processDefinition));
-        participants.append(getAllCandidateUsers());
+        participants.append(getParticipantsByLanes(processDefinition)).append(" ");
+        participants.append(getAllCandidateUsers()).append(" ");
         participants.append(" ").append(getAllAssignees());
         participants.append(" ").append(getAllCandidateGroups());
 
@@ -157,10 +156,17 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         //get participants from lanes
         StringBuilder participants = new StringBuilder();
         List<LaneSet> laneSets = processDefinition.getLaneSets();
+        Boolean firstEntry = true;
         for (LaneSet laneSet : laneSets) {
             List<Lane> lanes = laneSet.getLanes();
             for (Lane lane : lanes) {
-                participants.append(lane.getName()).append(",");
+                if(firstEntry) {
+                    firstEntry = false;
+                }
+                else {
+                    participants.append(",");
+                }
+                participants.append(lane.getName());
             }
         }
 

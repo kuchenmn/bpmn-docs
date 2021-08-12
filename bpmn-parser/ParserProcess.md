@@ -1,12 +1,12 @@
 # BPMN Parser Process - ParserProcess
 Process Summary
 ---------------
-| Category       | Values                                                                                                         |
-| -------------- | -------------------------------------------------------------------------------------------------------------- |
-| Participants   | Lanes: Lane 2,Lane 1,Candidate User(s): [demo, admin] Assignee(s): Coolio Candidate Group(s): [orange, banana] |
-| Start Event(s) | Start, Start Two                                                                                               |
-| End Event(s)   | End                                                                                                            |
-| Tasks          | 1                                                                                                              |
+| Category       | Values                                                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- |
+| Participants   | Lanes: Lane 2,Lane 1 Candidate User(s): [demo, admin]  Assignee(s): Coolio Candidate Group(s): [orange, banana] |
+| Start Event(s) | Start, Start Two                                                                                                |
+| End Event(s)   | End                                                                                                             |
+| Tasks          | 1                                                                                                               |
 
 Technical Documentation
 -----------------------
