@@ -81,7 +81,7 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         summary.put("Participants",participants.toString());
         summary.put("Start Event(s)",getStartEvents());
         summary.put("End Event(s)",getEndEvents());
-        summary.put("Tasks", String.valueOf(markdownDoc.getUserTasks().size()));
+        summary.put("Tasks", String.valueOf(getTaskCount()));
         markdownDoc.setSummary(summary);
 
         for (Map.Entry<String, String> entry : markdownDoc.getSummary().entrySet()) {
@@ -93,45 +93,67 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         /// Prerequisites
         stringBuilder.append(new Heading("Prerequisites", 3)).append("\n");
         //// Java Classes
-        stringBuilder.append(new Heading("Java Classes", 4)).append("\n")
-                .append(new UnorderedList<>(markdownDoc.getClasses())).append("\n");
+        if (markdownDoc.getClasses().size() > 0) {
+            stringBuilder.append(new Heading("Java Classes", 4)).append("\n")
+                    .append(new UnorderedList<>(markdownDoc.getClasses())).append("\n");
+        }
         //// Topics to Subscribe
-        stringBuilder.append(new Heading("Topics to Subscribe", 4)).append("\n")
-                .append(new UnorderedList<>(markdownDoc.getTopics())).append("\n");
+        if (markdownDoc.getTopics().size() > 0) {
+            stringBuilder.append(new Heading("Topics to Subscribe", 4)).append("\n")
+                    .append(new UnorderedList<>(markdownDoc.getTopics())).append("\n");
+        }
         //// Sub-Processes
-        stringBuilder.append(new Heading("Sub-processes", 4)).append("\n")
-                .append(new UnorderedList<>(markdownDoc.getSubProcesses())).append("\n");
+        if (markdownDoc.getSubProcesses().size() > 0) {
+            stringBuilder.append(new Heading("Sub-processes", 4)).append("\n")
+                    .append(new UnorderedList<>(markdownDoc.getSubProcesses())).append("\n");
+        }
         //// DMNs
-        stringBuilder.append(new Heading("DMNs", 4)).append("\n")
-                .append(new UnorderedList<>(markdownDoc.getDmns())).append("\n");
+        if (markdownDoc.getDmns().size() > 0) {
+            stringBuilder.append(new Heading("DMNs", 4)).append("\n")
+                    .append(new UnorderedList<>(markdownDoc.getDmns())).append("\n");
+        }
         //// Forms
-        stringBuilder.append(new Heading("Forms", 4)).append("\n")
-                .append(new UnorderedList<>(markdownDoc.getForms())).append("\n");
+        if (markdownDoc.getForms().size() > 0) {
+            stringBuilder.append(new Heading("Forms", 4)).append("\n")
+                    .append(new UnorderedList<>(markdownDoc.getForms())).append("\n");
+        }
 
         /// User Tasks
-        stringBuilder.append(new Heading("User Tasks", 3)).append("\n");
-        tableBuilder = new Table.Builder()
-                .withRowLimit(7)
-                .addRow("Key", "Assignee", "Candidate Users", "Candidate Groups", "Form Key");
+        if (markdownDoc.getUserTasks().size() > 0) {
+            stringBuilder.append(new Heading("User Tasks", 3)).append("\n");
+            tableBuilder = new Table.Builder()
+                    .withRowLimit(7)
+                    .addRow("Key", "Assignee", "Candidate Users", "Candidate Groups", "Form Key");
 
-        for (Task task : markdownDoc.getUserTasks()) {
-            tableBuilder.addRow(task.getKey(), task.getAssignee(), task.getCadidateUsers(), task.getCadidateGroups(), task.getFormKey());
+            for (Task task : markdownDoc.getUserTasks()) {
+                tableBuilder.addRow(task.getKey(), task.getAssignee(), task.getCadidateUsers(), task.getCadidateGroups(), task.getFormKey());
+            }
+            stringBuilder.append(tableBuilder.build()).append("\n").append("\n");
         }
-        stringBuilder.append(tableBuilder.build()).append("\n").append("\n");
 
         /// Service Tasks
-        stringBuilder.append(new Heading("Service Tasks", 3)).append("\n");
-        stringBuilder.append(markdownDoc.getServiceTasksAsMdTable());
-        stringBuilder.append("\n");
+        if (markdownDoc.getServiceTasks().size() > 0) {
+            stringBuilder.append(new Heading("Service Tasks", 3)).append("\n");
+            stringBuilder.append(markdownDoc.getServiceTasksAsMdTable());
+            stringBuilder.append("\n");
+            stringBuilder.append("\n");
+        }
 
         /// Script Tasks
-        stringBuilder.append(new Heading("Script Tasks", 3)).append("\n");
-        stringBuilder.append(markdownDoc.getScriptTasksAsMdTable());
-        stringBuilder.append("\n");
+        if (markdownDoc.getScriptTasks().size() > 0) {
+            stringBuilder.append(new Heading("Script Tasks", 3)).append("\n");
+            stringBuilder.append(markdownDoc.getScriptTasksAsMdTable());
+            stringBuilder.append("\n");
+            stringBuilder.append("\n");
+        }
+
         /// Business Rule Tasks
-        stringBuilder.append(new Heading("Business Rule Tasks", 3)).append("\n");
-        stringBuilder.append(markdownDoc.getBusinessRuleTasksAsMdTable());
-        stringBuilder.append("\n");
+        if (markdownDoc.getBusinessRuleTasks().size() > 0) {
+            stringBuilder.append(new Heading("Business Rule Tasks", 3)).append("\n");
+            stringBuilder.append(markdownDoc.getBusinessRuleTasksAsMdTable());
+            stringBuilder.append("\n");
+            stringBuilder.append("\n");
+        }
 
         // TODO Element Documentation
         stringBuilder.append(new Heading("Element Documentation", 2)).append("\n");
@@ -385,6 +407,18 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
             }
         }
         return assignees;
+    }
+
+    private int getTaskCount() {
+        int count = 0;
+        List<Element> elements = processElement.elements();
+        for (Element element:elements) {
+            String tagName = element.getTagName();
+            if (tagName.contains("Task")) {
+                count++;
+            }
+        }
+        return count;
     }
 
 }
