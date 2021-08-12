@@ -12,7 +12,7 @@ Technical Documentation
 -----------------------
 ### Prerequisites
 #### Sub-processes
-- Request document
+- Request document - requestDocument_en
 #### DMNs
 - Check application automatically - checkRisk_en
 #### Forms
@@ -35,5 +35,3 @@ Technical Documentation
 | ------------------------------- | ---------------------------------------------- | ------------ | --------------- | ----------------- | ------------- |
 | Check application automatically | BusinessRuleTask_CheckApplicationAutomatically | checkRisk_en | riskDMNresult   | resultList        |               |
 
-Element Documentation
----------------------

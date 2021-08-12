@@ -126,11 +126,11 @@
     <bpmn:sequenceFlow id="Flow_0chordw" sourceRef="ExpressionTaskTask" targetRef="ConnectorTaskTask" />
     <bpmn:sequenceFlow id="Flow_0n2ug4s" sourceRef="ConnectorTaskTask" targetRef="EndEndEvent" />
     <bpmn:sequenceFlow id="Flow_13pfmt9" sourceRef="SecondDMNTask" targetRef="ScriptTaskTask1" />
-    <bpmn:callActivity id="CallActivityCallActivity" name="Call Activity" calledElement="test">
+    <bpmn:callActivity id="CallActivityCallActivity" name="Call Activity" calledElement="anotherProcess">
       <bpmn:incoming>Flow_1gd2c9j</bpmn:incoming>
       <bpmn:outgoing>Flow_1cdiv8b</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:callActivity id="SubprocessCallActivity" name="Subprocess" calledElement="test2">
+    <bpmn:callActivity id="SubprocessCallActivity" name="Subprocess" calledElement="aProcessWeUse">
       <bpmn:incoming>Flow_1cdiv8b</bpmn:incoming>
       <bpmn:outgoing>Flow_0dt10yb</bpmn:outgoing>
     </bpmn:callActivity>

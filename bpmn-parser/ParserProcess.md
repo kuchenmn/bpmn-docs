@@ -4,7 +4,7 @@ Process Summary
 ---------------
 | Category       | Values                                                                                                          |
 | -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Participants   | Lanes: Lane 2,Lane 1 Candidate User(s): [demo, admin]  Assignee(s): Coolio Candidate Group(s): [banana, orange] |
+| Participants   | Lanes: Lane 2,Lane 1 Candidate User(s): [admin, demo]  Assignee(s): Coolio Candidate Group(s): [banana, orange] |
 | Start Event(s) | Start, Start Two                                                                                                |
 | End Event(s)   | End                                                                                                             |
 | Tasks          | 9                                                                                                               |
@@ -15,8 +15,8 @@ Technical Documentation
 #### Topics to Subscribe
 - serviceTask1Worker
 #### Sub-processes
-- Call Activity
-- Subprocess
+- Subprocess - null
+- Call Activity - test
 #### DMNs
 - Business Rule Task - dmn_ref
 - Second DMN - dmn_ref
@@ -25,7 +25,7 @@ Technical Documentation
 ### User Tasks
 | Key                 | Assignee | Candidate Users | Candidate Groups | Form Key                      | Documentation                                             |
 | ------------------- | -------- | --------------- | ---------------- | ----------------------------- | --------------------------------------------------------- |
-| SayHelloToAdminTask | Coolio   | [demo, admin]   | [banana, orange] | app:embedded:createTweet.html | This is where the user needs to say "hello" to the admin. |
+| SayHelloToAdminTask | Coolio   | [admin, demo]   | [banana, orange] | app:embedded:createTweet.html | This is where the user needs to say "hello" to the admin. |
 
 ### Service Tasks
 | Name            | ID                 | Behavior                                             | Documentation |
@@ -47,5 +47,3 @@ Technical Documentation
 | Business Rule Task | BusinessRuleTaskTask | dmn_ref     | decision        | singleResult      |               |
 | Second DMN         | SecondDMNTask        | dmn_ref     | decision        | singleEntry       |               |
 
-Element Documentation
----------------------

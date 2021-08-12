@@ -317,7 +317,8 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         List<String> subProcesses = new ArrayList<>();
 
         for (Element element: subProcessesElements) {
-            subProcesses.add(element.attribute("name"));
+            subProcesses.add(element.attribute("name") + " - " + element.attribute("calledElement"));
+
         }
         return subProcesses;
     }
