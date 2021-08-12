@@ -58,6 +58,10 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
         StringBuilder stringBuilder = new StringBuilder()
                 .append("# ").append(markdownDoc.getProcessName()).append(" - ").append(markdownDoc.getProcessKey()).append("\n");
 
+        if(markdownDoc.getDocumentation() != null) {
+            stringBuilder.append(markdownDoc.getDocumentation()).append("\n");
+        }
+
         // Header Process Summary
 
         stringBuilder.append(new Heading("Process Summary", 2)).append("\n");
