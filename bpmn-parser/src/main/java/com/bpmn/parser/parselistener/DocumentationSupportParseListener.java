@@ -233,7 +233,16 @@ public class DocumentationSupportParseListener extends AbstractBpmnParseListener
                 task.setBehavior("JavaClass: " + javaClass);
                 javaClasses.add(javaClass);
             }
-            //TODO Connector!
+            //Connector
+            else {
+                try {
+                    String connector = element.elements("extensionElements").get(0).elements("connector").get(0).elements().get(0).getText();
+                    task.setBehavior("Connector: " + connector);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             serviceTasks.add(task);
         }
         markdownDoc.setServiceTasks(serviceTasks);
