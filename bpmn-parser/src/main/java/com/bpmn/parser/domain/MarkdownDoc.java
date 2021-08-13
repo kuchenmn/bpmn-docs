@@ -1,5 +1,7 @@
 package com.bpmn.parser.domain;
 
+import net.steppschuh.markdowngenerator.table.Table;
+
 import java.util.List;
 import java.util.Map;
 
@@ -120,5 +122,41 @@ public class MarkdownDoc {
 
     public void setBusinessRuleTasks(List<Task> businessRuleTasks) {
         this.businessRuleTasks = businessRuleTasks;
+    }
+
+    public String getServiceTasksAsMdTable() {
+        Table.Builder tableBuilder = new Table.Builder()
+                .withAlignment(Table.ALIGN_CENTER)
+                .addRow("Name","ID","Behavior", "Documentation");
+        for (Task serviceTask:serviceTasks) {
+            tableBuilder
+                    .withAlignment(Table.ALIGN_LEFT)
+                    .addRow(serviceTask.getName(),serviceTask.getKey(), serviceTask.getBehavior(), serviceTask.getDocumentation());
+        }
+        return tableBuilder.build().toString();
+    }
+
+    public String getBusinessRuleTasksAsMdTable() {
+        Table.Builder tableBuilder = new Table.Builder()
+                .withAlignment(Table.ALIGN_CENTER)
+                .addRow("Name","ID","DecisionRef","Result Variable","MapDecisionResult", "Documentation");
+        for (Task businessRuleTask:businessRuleTasks) {
+            tableBuilder
+                    .withAlignment(Table.ALIGN_LEFT)
+                    .addRow(businessRuleTask.getName(),businessRuleTask.getKey(),businessRuleTask.getDecisionRef(),businessRuleTask.getResultVariable(),businessRuleTask.getMapDecisionResult(), businessRuleTask.getDocumentation());
+        }
+        return tableBuilder.build().toString();
+    }
+
+    public String getScriptTasksAsMdTable() {
+        Table.Builder tableBuilder = new Table.Builder()
+                .withAlignment(Table.ALIGN_CENTER)
+                .addRow("Name","ID","Script Format","Script / Resource", "Documentation");
+        for (Task scriptTask:scriptTasks) {
+            tableBuilder
+                    .withAlignment(Table.ALIGN_LEFT)
+                    .addRow(scriptTask.getName(),scriptTask.getKey(),scriptTask.getScriptFormat(),scriptTask.getScript(), scriptTask.getDocumentation());
+        }
+        return tableBuilder.build().toString();
     }
 }
