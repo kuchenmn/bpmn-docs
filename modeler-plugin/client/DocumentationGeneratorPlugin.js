@@ -1,16 +1,9 @@
 'use strict';
 
-//const os = require("os");
-//const fs = require("fs");
 import * as os from 'os';
-//import * as fs from 'fs';
-
-console.log(os);
 
 function DocumentationGeneratorPlugin(elementRegistry, editorActions, canvas, modeling) {
     this._elementRegistry = elementRegistry;
-    this._modeling = modeling;
-
     let self = this;
 
     editorActions.register({
@@ -23,7 +16,7 @@ function DocumentationGeneratorPlugin(elementRegistry, editorActions, canvas, mo
 function downloadFile(content){
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
-    element.setAttribute('download', "mytest.md");
+    element.setAttribute('download', "documentation.md");
 
     element.style.display = 'none';
     document.body.appendChild(element);
@@ -39,31 +32,45 @@ function seperateElements(_elements) {
         participants: [] ,
         tasks: [],
         startEvents: [] ,
-        endEvents: []
-
+        endEvents: [],
+        documentations: []
     }
     Object.keys(_elements).forEach(function(key) {
         if(_elements[key].element.businessObject != null && _elements[key].element.type != "label")
         {
+            if(_elements[key].element.businessObject.$type.includes("Process")) {
+                elements.process = _elements[key].element.businessObject;
+            }
+
             if(_elements[key].element.businessObject.$type.includes("EndEvent")) {
-                elements.endEvents.push(_elements[key].element.businessObject)
+                elements.endEvents.push(_elements[key].element.businessObject);
             }
 
             if(_elements[key].element.businessObject.$type.includes("StartEvent")) {
-                elements.startEvents.push(_elements[key].element.businessObject)
+                elements.startEvents.push(_elements[key].element.businessObject);
             }
 
             if(_elements[key].element.businessObject.$type.includes("Task")) {
-                elements.tasks.push(_elements[key].element.businessObject)
+                elements.tasks.push(_elements[key].element.businessObject);
             }
 
-
             if(_elements[key].element.businessObject.$type.includes("Participant")) {
-                elements.participants.push(_elements[key].element.businessObject)
+                elements.participants.push(_elements[key].element.businessObject);
+            }
+
+            if(_elements[key].element.businessObject.$type.includes("Collaboration")) {
+                elements.collaboration = _elements[key].element.businessObject;
             }
 
             if(_elements[key].element.businessObject.$type.includes("Lane")) {
-                elements.lanes.push(_elements[key].element.businessObject)
+                elements.lanes.push(_elements[key].element.businessObject);
+            }
+
+            if(_elements[key].element.businessObject.documentation != undefined
+                && !_elements[key].element.businessObject.$type.includes("Process")
+                && !_elements[key].element.businessObject.$type.includes("Collaboration"))
+            {
+                elements.documentations.push(_elements[key].element.businessObject);
             }
         }
     });
@@ -81,18 +88,29 @@ function getNames(elements) {
     return result;
 }
 
-// Todo: handle no-pool-doku and multi-process doku better
-function getProcessName(participants) {
-    if(participants.length > 1){
-        return "Multi-Process-Doku";
+function getProcessName(elements) {
+    if(elements.participants.length > 1){
+        return "Collaboration";
     }
-    if(participants.length == 1){
-        return participants[0].name;
+    if(elements.participants.length == 1){
+        return elements.participants[0].name;
     }
-    return "No-Pool-Doku";
+    if(elements.process != undefined){
+        return elements.process.name;
+    }
+    return undefined;
 }
 
 function getProcessDefinitionKey(elements) {
+    if(elements.participants.length > 1){
+        return elements.collaboration.id;
+    }
+    if(elements.participants.length == 1){
+        return elements.participants[0].id;
+    }
+    if(elements.process != undefined){
+        return elements.process.id;
+    }
     return undefined;
 }
 
@@ -174,19 +192,71 @@ function getHR(tasks){
     return hrs;
 }
 
+function getUserTasks(tasks) {
+    let userTasks = [];
+    tasks.forEach(function (task) {
+        if(task.$type.includes("UserTask")){
+            userTasks.push(task);
+        }
+    });
+    return userTasks;
+}
+
+function getServiceTasks(tasks) {
+    let serviceTasks = [];
+    tasks.forEach(function (task) {
+        if(task.$type.includes("ServiceTask")){
+            if(task.class != undefined){
+                task.behavior = task.class;
+            }
+            else if(task.topic != undefined){
+                task.behavior = "external (topic = " + task.topic + ")";
+            }
+            else if(task.delegateExpression != undefined){
+                task.behavior = task.delegateExpression;
+            }
+            serviceTasks.push(task);
+        }
+    });
+    return serviceTasks;
+}
+
+function getScriptTasks(tasks) {
+    let scriptTasks = [];
+    tasks.forEach(function (task) {
+        if(task.$type.includes("ScriptTask")){
+            scriptTasks.push(task);
+        }
+    });
+    return scriptTasks;
+}
+
+function getBusinessRuleTasks(tasks) {
+    let businessRuleTasks = [];
+    tasks.forEach(function (task) {
+        if(task.$type.includes("BusinessRuleTask")){
+            businessRuleTasks.push(task);
+        }
+    });
+    return businessRuleTasks;
+}
+
 DocumentationGeneratorPlugin.prototype.createDocumentation = function() {
     let elements = seperateElements(this._elementRegistry._elements);
     let fileContent = "";
 
-    console.log(elements);
-
     //Header
-    let processName = getProcessName(elements.participants);
+    let processName = getProcessName(elements);
     let processDefinitionKey = getProcessDefinitionKey(elements);
 
     fileContent += "# "+ processName + " - " + processDefinitionKey + os.EOL;
 
     //Process Summary
+
+    if(elements.process != undefined && elements.process.documentation != undefined){
+        fileContent +=  elements.process.documentation + os.EOL
+    }
+
     let humanRessources = getHR(elements.tasks);
     let lanes = getNames(elements.lanes);
     let startEvents = getNames(elements.startEvents);
@@ -244,10 +314,79 @@ DocumentationGeneratorPlugin.prototype.createDocumentation = function() {
         })
     }
 
+    // User Tasks
+    let userTasks = getUserTasks(elements.tasks)
+    if(userTasks.length > 0){
+        fileContent += os.EOL + "### User Tasks" + os.EOL;
+        fileContent += "| Name | ID | Assignee | Candidate Users | Candidate Groups | formKey / formFields |" + os.EOL;
+        fileContent += "|-|-|-|-|-|-|" + os.EOL;
+        userTasks.forEach(function (userTask) {
+            fileContent += "|" + userTask.name;
+            fileContent += "|" + userTask.id;
+            fileContent += "|" + userTask.assignee;
+            fileContent += "|" + userTask.candidateUsers;
+            fileContent += "|" + userTask.candidateGroups;
+            fileContent += "|" + userTask.formKey;
+            fileContent += "|" + os.EOL;
+        });
+    }
+
+    // Service Tasks
+    let serviceTasks = getServiceTasks(elements.tasks)
+    if(serviceTasks.length > 0){
+        fileContent += os.EOL + "### Service Tasks" + os.EOL;
+        fileContent += "| Name | ID | Bahavior |" + os.EOL;
+        fileContent += "|-|-|-|" + os.EOL;
+        serviceTasks.forEach(function (serviceTask) {
+            fileContent += "|" + serviceTask.name;
+            fileContent += "|" + serviceTask.id;
+            fileContent += "|" + serviceTask.behavior;
+            fileContent += "|" + os.EOL;
+        });
+    }
+
+    // Script Tasks
+    let scriptTasks = getScriptTasks(elements.tasks)
+    if(serviceTasks.length > 0){
+        fileContent += os.EOL + "### Script Tasks" + os.EOL;
+        fileContent += "| Name | ID | Script Format | Script / Resource |" + os.EOL;
+        fileContent += "|-|-|-|-|" + os.EOL;
+        scriptTasks.forEach(function (scriptTask) {
+            fileContent += "|" + scriptTask.name;
+            fileContent += "|" + scriptTask.id;
+            fileContent += "|" + scriptTask.scriptFormat;
+            fileContent += "|" + (scriptTask.script != undefined ? scriptTask.script : scriptTask.resource);
+            fileContent += "|" + os.EOL;
+        });
+    }
+
+    // Business Rule Tasks
+    let businessRuleTasks = getBusinessRuleTasks(elements.tasks)
+    if(businessRuleTasks.length > 0){
+        fileContent += os.EOL + "### Business Rule Tasks" + os.EOL;
+        fileContent += "| Name | ID | DecisionRef | Result Variable | Map Decision Result |" + os.EOL;
+        fileContent += "|-|-|-|-|-|" + os.EOL;
+        businessRuleTasks.forEach(function (task) {
+            fileContent += "|" + task.name;
+            fileContent += "|" + task.id;
+            fileContent += "|" + task.decisionRef;
+            fileContent += "|" + task.resultVariable;
+            fileContent += "|" + task.mapDecisionResult;
+            fileContent += "|" + os.EOL;
+        });
+    }
+
+    // Element Documentation
+    if(elements.documentations.length > 0){
+        fileContent += os.EOL + "## Element Documentation" + os.EOL;
+        elements.documentations.forEach(function (documentationElement) {
+            fileContent += "**" + documentationElement.name + " - " ;
+            fileContent += documentationElement.$type.replace("bpmn:", "") + "**\\" + os.EOL;
+            fileContent += documentationElement.documentation[0].text + os.EOL + os.EOL;
+        })
+    }
 
     // End
-    console.log(fileContent);
-
     downloadFile(fileContent);
 
 };

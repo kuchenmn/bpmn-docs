@@ -4,4 +4,3 @@ var registerBpmnJSPlugin = require('camunda-modeler-plugin-helpers').registerBpm
 
 import DocumentationGeneratorPlugin from "./DocumentationGeneratorPlugin";
 registerBpmnJSPlugin(DocumentationGeneratorPlugin);
-console.log(DocumentationGeneratorPlugin.documentationGeneratorPlugin)
